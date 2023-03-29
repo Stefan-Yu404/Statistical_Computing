@@ -17,4 +17,4 @@ Catalogue:
   
   Remark:
   1. The examples comes from: Computational Statistics, Geof H. Givens and Jennifer A.Hoeting, 2nd Version.
-  2. There are two versions using python and R.
+  2. Coding Language: R.
