@@ -1,0 +1,62 @@
+---
+title: "HW8"
+author: "Zeqiu.Yu"
+date: "2022-11-21"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Homework 8  
+# 7.1  
+(a.)  
+```{r}
+n <- 200
+set.seed(0)
+func <- sample(1:2,prob=c(0.7,0.3),size=n,replace=TRUE)
+mu <- c(7,10)
+sd <- c(.5,.5)
+y <- rnorm(n=n,mean=mu[func],sd=sd[func])
+
+x=seq(5,14,by=.01)
+d=.7*dnorm(x,7,.5) + .3*dnorm(x,10,.5)
+par(mfrow=c(1,1))
+hist(y,breaks=20,freq=FALSE,main="Histogram of mixture data with n=200",ylab="Density",ylim = c(0,0.6))
+points(x,d,type="l")
+
+```
+  
+  
+(b.)  
+```{r}
+## INITIAL VALUES
+n = 10000
+x.val1 = NULL
+set.seed(0)
+
+## FUNCTIONS ##note prior is U(0,1)
+f = function(x){prod(x*dnorm(y,7,0.5) + (1-x)*dnorm(y,10,0.5))}
+R = function(xt,x){f(x)*g(xt)/(f(xt)*g(x))}
+
+## MAIN
+# BETA(1,1) PROPOSAL DENSITY
+g = function(x){dunif(x,0,1)}
+x.val1[1] = runif(1,0,1)
+
+for(i in 1:n){
+      xt = x.val1[i]
+      x = runif(1,0,1)
+      p = min(R(xt,x),1)
+      d = rbinom(1,1,p)
+      x.val1[i+1] = x*d + xt*(1-d)
+}
+mean(x.val1[201:(n+1)])
+par(mfrow=c(1,2))
+plot(x.val1[201:(n+1)],ylim=c(0,1),type="l",ylab="delta",xlab="t")
+title("Sample path for U(0,1) Proposal Dist.")
+hist(x.val1[201:(n+1)],breaks=20,xlab="delta",
+      main="Hist. for U(0,1) Proposal Dist.")
+```
+Hence, the expectation of $\delta$ is 0.6879803.

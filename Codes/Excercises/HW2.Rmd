@@ -1,0 +1,93 @@
+---
+title: "HW2"
+author: "Zeqiu.Yu"
+date: "2022-09-26"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+# Question 1
+
+1. Use Simulation to approximate the following integrals. Describe your algorithm first. Attach your code and output.
+* \[ \int_{1}^{3}\frac{x}{(1 + x^2)^2} \,dx\ \]
+* \[ \int_{-\infty}^{\infty} x^2e^{-x^2} \,dx\ \]
+* \[ \int_{-1}^{1}\int_{-1}^{1}|x-y|\;dx\;dy\]
+Solutions  
+
+Because we use \[\frac{1}{n}\,\sum_{i = 1}^{n}\,h(x)\] to estimate E[h(X)].We should define h(X) and f(X) for each integral. 
+(1) For the first integral
+The former intgral can be writtern as
+\[ \int_{1}^{3}\frac{1}{2}*2\frac{x}{(1 + x^2)^2} \,dx\ \]
+\[X\sim Uniform(1,3),\; f(x) = \frac{1}{2},\; 1<=x<=3\]
+\[h(x) = \frac{2x}{(1 + x^2)^2}\]
+```{r, echo = TRUE, eval = TRUE, warning = TRUE, result = TRUE,include = TRUE}
+n_list <- c(1000, 10000, 100000,1000000)
+for(n in n_list){
+  # Sampling
+  x <- runif(n,1,3)
+  
+  s <- 2*x/(1+x^2)^2
+  outcome <- 1/n*sum(s)
+  print(sprintf("The integral is %.4f with the sample size of %d", outcome, n))
+}
+```
+(2) For the second integral
+The former intgral can be writtern as
+\[ \int_{0}^{\infty} \frac{1}{2\sqrt{x}}e^{-x} \,dx\ \]
+\[X\sim Exp(1),\; f(x) = e^{-x},\; x>0\]
+\[h(x) = \frac{1}{2\sqrt{x}}\]
+```{r, echo = TRUE, eval = TRUE, warning = TRUE, result = TRUE,include = TRUE}
+n_list <- c(1000, 10000, 100000,1000000)
+for(n in n_list){
+  # Sampling
+  x <- rexp(n,1)
+  
+  s <- 1/(2*sqrt(x))
+  outcome <- 1/n*sum(s)
+  print(sprintf("The integral is %.4f with the sample size of %d", outcome, n))
+}
+```
+(3) For the third integral
+The former intgral can be writtern as
+\[ \int_{-1}^{1}\frac{1}{2}\int_{-1}^{1}\frac{1}{2} 4|x-y|\;dx\;dy\]
+\[X\sim Uniform(-1,1),\; Y\sim Uniform(-1,1)\]
+\[f(x,y) = \int_{-1}^{1}\int_{-1}^{1}\frac{1}{4}\;dx\;dy,\; x>0\]
+\[h(x,y) = 4|x-y|\]
+```{r, echo = TRUE, eval = TRUE, warning = TRUE, result = TRUE,include = TRUE}
+n_list <- c(1000, 10000, 100000,1000000)
+for(n in n_list){
+  # Sampling
+  x <- runif(n,-1,1)
+  y <- runif(n,-1,1)
+  
+  s <- 4*abs(x-y)
+  outcome <- 1/n*sum(s)
+  print(sprintf("The integral is %.4f with the sample size of %d", outcome, n))
+}
+```
+
+# Question 2
+Consider the model given by 
+\[X\sim lognormal(0,1)\;\;\;\; and\; logY = 9 + 3logX + e\, , e\sim N(0,1)\]
+is independt of X. Use simulation to estimate E[Y/X].  
+Let Z be the standard normal distribution, then f(x,z) = f(x)f(z) because of the independence of x and z.
+\[h(x,z) = \frac{Y}{X} = e^{9+z}x^2\]
+\[E[Y/X] = \iint_{X,Z} h(x,z)f(x,z)\;dxdy =\int_Xx^2f(x)dx\int_Ze^{9+z}f(z)dz\]
+
+
+```{r, echo = TRUE, eval = TRUE, warning = TRUE, result = TRUE,include = TRUE}
+n_list <- c(1000, 10000, 100000,1000000,10000000)
+
+for(n in n_list){
+  # Sampling
+  x <- rlnorm(n,0,1) 
+  z <- rnorm(n,0,1)
+  s1 <- sum(x^2)/n
+  s2 <- sum(exp(9+z))/n
+  outcome <- s1*s2
+  print(sprintf("The integral is %.4f with the sample size of %d", outcome, n))
+}
+```
+

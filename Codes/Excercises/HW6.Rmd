@@ -1,0 +1,44 @@
+---
+title: "HW6"
+author: "Zeqiu.Yu"
+date: "2022-11-04"
+output: pdf_document
+---
+
+# HW 6  
+Textbook 9.5  (b)  
+```{r, echo = TRUE, eval = TRUE, warning = TRUE, result = TRUE,include = TRUE}
+x <- log(c(25, 42, 45, 46, 51,  103, 124,  146, 340,  396, 412, 876, 1112))
+y <-log( c(24, 40, 719, 727, 791,  1166, 1235,  1581, 1804,  3460, 3808))
+mu <- mean(x)-mean(y)
+print(mu)
+```
+```{r, echo = TRUE, eval = TRUE, warning = TRUE, result = TRUE,include = TRUE}
+diff_perm <- numeric(10000) 
+for (i in 1:length(diff_perm)){
+  xy=sample(c(x,y),length(x)+length(y),replace=FALSE)
+  diff_perm[i]=mean(xy[1:length(x)])-mean(xy[(length(x)+1):(length(x)+length(y))])
+}
+hist(diff_perm,breaks=20)
+abline(v = mu)
+pvalue=sum(diff_perm<mu)/10000
+print(pvalue)
+```
+  
+  2.  
+```{r, echo = TRUE, eval = TRUE, warning = TRUE, result = TRUE,include = TRUE}
+x <- c(25, 42, 45, 46, 51,  103, 124,  146, 340,  396, 412, 876, 1112)
+y <- c(24, 40, 719, 727, 791,  1166, 1235,  1581, 1804,  3460, 3808)
+m_b <- sum(x)/(length(x)+3)
+m_j=numeric(length(x))
+for (i in 1:length(x)){
+  x_temp=x[-i]
+  m_j[i]=sum(x_temp)/(length(x)+3-1)
+}
+jackknife=length(x)*m_b-(length(x)-1)/length(x)*sum(m_j)
+print(sprintf("After correction using Jacknife: %.3f." , jackknife))
+print(sprintf("The mean: %.3f and the mean without correction: %.3f",  mean(x), m_b))
+
+```
+
+

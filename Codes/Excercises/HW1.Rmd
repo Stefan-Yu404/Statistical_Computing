@@ -1,0 +1,62 @@
+---
+title: "HW1"
+author: "Zeqiu.Yu"
+date: "2022-09-22"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Homework1{#sec:requirements}
+1. Read Chapter 1 in textbook (givens and Hoeting)              FINISHED!
+2. Install R and Rstudion in your computer                      FINISHED!
+3. Go through the Rmarkdown and R codes in Intro.Rmd            FINISHED!
+4. If you take cards numbered from 1-10 and shuffle them, and lay them down in order, what is the probability that at least one card matches its position. For example card 3 comes down third? Using simulation to find the answer and compare it to the theoretical value.                 FINISHED!
+\newpage
+
+## Q4{#sec:question4}
+1. Define a function to judge whether there is at least one card matches its position. Yes = 1, No = 0
+```{r ComparingFunction, echo = TRUE, eval = TRUE, warning = FALSE, result = TRUE,include = TRUE}
+IdenticalVector <- function(x,y){
+  numTrue <-  0
+  for(i in 1:length(x)){
+    if(x[i]==y[i]){
+      numTrue <-  numTrue + 1
+    }
+  }
+  if(numTrue >0){
+    return(1)
+  }else{
+    return(0)
+  }
+}
+
+```
+For n trials, find successful times:
+```{r Trials, echo = TRUE, eval = TRUE, warning = FALSE, result = TRUE,include = TRUE}
+cPostion <- c(1:10)
+for(numTrials in c(10, 100, 1000, 10000,100000)){
+numSuccess <-  0
+for(i in 1:numTrials){
+  afterShuffle <- sample(cPostion, replace = F)
+  numSuccess <- numSuccess + IdenticalVector(cPostion, afterShuffle)
+}
+print(sprintf("After %d trials, the frequency is %.4f", numTrials, numSuccess/numTrials))}
+
+```
+And the theoretical value is 
+\[
+1 - \frac{10!\sum_{i=0}^{n} \frac{(-1)^i}{i!}}{\mathrm{P}_{10}^{10}}
+\]
+Hence, we can get theoretical result:
+```{r TheoreticalTrials, echo = TRUE, eval = TRUE, warning = FALSE, result = TRUE,include = TRUE}
+sum = 0
+for(i in c(0:10)){
+  eachFactor <-  factorial(10)*(-1)^(i)/factorial(i)/factorial(10)
+  sum <- sum + eachFactor
+}
+print(1-sum)
+
+```
+

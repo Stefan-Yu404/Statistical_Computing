@@ -1,0 +1,54 @@
+---
+title: "HW9"
+author: "Zeqiu.Yu"
+date: "2022-12-02"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Homework 9 
+## 7.1  
+(d.)  
+```{r, echo = TRUE, eval = TRUE, warning = TRUE, result = TRUE,include = TRUE}
+set.seed(0)
+n <- 200
+func <- sample(1:2,prob=c(0.7,0.3),size=n,replace=TRUE)
+mu <- c(7,10)
+sd <- c(.5,.5)
+x <- rnorm(n,mean=mu[func],sd=sd[func])
+
+num.its = 100000
+u=rep(0,num.its)
+u[1]= runif(1,-1,1)
+p=rep(0,num.its)
+p[1]=exp(u[1])/(1+exp(u[1]))
+
+log.like<-function(p,x) { 
+  sum(log(p*dnorm(x,7,.5)+(1-p)*dnorm(x,10,.5)))
+}
+
+for (i in 1:(num.its-1)) {
+	u[i+1]=u[i]+runif(1,-1,1)
+	p[i+1]=exp(u[i+1])/(1+exp(u[i+1]))
+	R=exp(log.like(p[i+1],x)-log.like(p[i],x))*exp(u[i+1])/(1+exp(u[i+1]))^2/exp(u[i])*(1+exp(u[i]))^2
+	
+	if (R<1){
+		 if(rbinom(1,1,R)==0)	{p[i+1]=p[i]; u[i+1]=u[i]}
+}}
+    
+
+burn.in=1:1000
+delta <- mean(p[-burn.in])  
+delta
+
+par(mfrow=c(1,2))
+plot(p,ylim=c(0,1),type="l",ylab="delta",xlab="t")
+hist(p,breaks=20,xlab="delta",
+      main="Hist. for Unif(-1,1) Walk")
+```
+The expectation of $\delta = `r delta`$.  
+(e.)  
+It is close to the result of MCMC: 0.6879803(which is calculated in HW 8). However, after plotting ACF, we find Random walk converges faster than MCMC.

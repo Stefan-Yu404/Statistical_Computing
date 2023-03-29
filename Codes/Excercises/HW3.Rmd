@@ -1,0 +1,64 @@
+---
+title: "HW3"
+author: "Zeqiu.Yu"
+date: "2022-10-09"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Homework 3  
+## Question:  
+Suppose we want to estimate S=E[$X^2$] when X has the density that is proportional to $q(x) = e^{-\frac{|x|^3}{3}}$.  
+1. Use rejection sampling to estimate E[$X^2$]. Describe your algorithm first. Attach your R code and output. Be sure to count and report your acceptance ratio.
+
+Solution:  
+1. I first need to define an envelop function with a particular density function.
+I want to sample y from standard normal distribution. Then I need to find an $\alpha$ s.t.
+\[\frac{1}{\alpha\sqrt{2\pi}}e^{-\frac{x^2}{2}} \geq e^{-\frac{|x|^3}{3}}\]
+Take the algorithm:
+\[\log{\alpha\sqrt{2\pi}}\leq\frac{|x|^3}{3} - \frac{x^2}{2}\], and $RHS \geq -\frac{1}{6}$, I take $\alpha = \frac{e^{-\frac{1}{6}}}{\sqrt{2\pi}}$  
+Then I get the envelop function
+\[e(y) = \frac{g(y)}{\alpha} = e^{-\frac{x^2}{2} + \frac{1}{6}}\]
+
+```{r, echo = TRUE, eval = TRUE, warning = TRUE, result = TRUE,include = TRUE}
+deci <- function(){
+  y_i <- rnorm(1)
+  q_y <- exp(-abs(y_i)^3/3)
+  e_y <- exp(-y_i^2/2 + 1/6)
+  u <- runif(1)
+  if(u<=q_y/e_y){
+    return(y_i)
+  }else{return(NULL)}
+}
+```
+Then I want to sample 1000, 10000 and 100000 y from f(x)
+```{r, echo = TRUE, eval = TRUE, warning = TRUE, result = TRUE,include = TRUE}
+
+sSizes <- c(10000, 100000, 1000000)
+
+for(sSize in sSizes){
+  i = 0
+  j = 0
+  y <- c()
+  while(i<=sSize){
+    j = j + 1
+    y_i <- deci()
+    if(is.null(y_i)){
+      next
+    }else{
+      y[i] <- y_i
+      i = i+1
+    }
+  }
+  estimation = sum(y^2)/sSize
+  print(sprintf("After obtaining %d numbers from f(x), E[X^2] is estimated to be %.3f", sSize, estimation))
+  print(sprintf("The acceptance ratio is: %.2f", sSize/j))
+}
+
+```
+After using MC to estimate the integral of q(x), I find $f(x) = \frac{q(x)}{2.5758}$, and the acceptance rate is $\frac{\alpha}{c} = 0.869841$, which approximates with the accepatance above.
+
+
+
